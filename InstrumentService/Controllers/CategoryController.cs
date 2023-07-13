@@ -37,5 +37,35 @@ namespace InstrumentService.Controllers
 
             return View(obj);
         }
+
+        //GET - Edit
+        public IActionResult Edit(int id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            var obj = _dp.Category.Find(id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
+
+        //POST - Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category obj)
+        {
+            if (ModelState.IsValid)
+            {
+                _dp.Category.Update(obj);
+                _dp.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(obj);
+        }
     }
 }
