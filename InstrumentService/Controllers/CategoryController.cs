@@ -28,9 +28,14 @@ namespace InstrumentService.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Category obj)
         {
-            _dp.Category.Add(obj);
-            _dp.SaveChanges();
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _dp.Category.Add(obj);
+                _dp.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View(obj);
         }
     }
 }

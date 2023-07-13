@@ -2,15 +2,17 @@
 
 <form method="post" asp-action="Create">
     <div class="border p-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3 row">
             <h2 class="text-info pl-3">Добавить категорию</h2>
         </div>
         <div class="row">
             <div class="col-8">
                 <div class="mb-3 row">
-                    <label class="col-4 col-form-label">Название</label>
+                    <label asp-for="Name" class="col-4 col-form-label">Название</label>
                     <div class="col-8">
                         <input asp-for="Name" class="form-control" id="Name">
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -18,6 +20,7 @@
                     <label asp-for="DisplayOrder" class="col-4 col-form-label">Порядок отображения</label>
                     <div class="col-8">
                         <input asp-for="DisplayOrder" class="form-control" id="DisplayOrder">
+                        <span asp-validation-for="DisplayOrder" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -37,3 +40,9 @@
         </div>
     </div>
 </form>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
