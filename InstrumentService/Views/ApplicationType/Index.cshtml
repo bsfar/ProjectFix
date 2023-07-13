@@ -1,0 +1,43 @@
+﻿@model IEnumerable<InstrumentService.Models.ApplicationType>
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Список типов приложения</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="ApplicationType" asp-action="Create" class="btn btn-primary">
+                Создать новый тип приложения
+            </a>
+        </div>
+    </div>
+
+    <br /><br />
+
+    @if (Model.Count() > 0)
+    {
+        <table class="table table-bordered table-striped" style="width: 100%">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        Название категории
+                    </th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var obj in Model)
+                {
+                    <tr>
+                        <td>@obj.Name</td>
+                        <td></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Такого типа приложения не существует</p>
+    }
+</div>
