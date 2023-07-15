@@ -7,7 +7,7 @@
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Category" asp-action="Create" class="btn btn-primary">
-                Создать новую категорию
+                <i class="fa-solid fa-circle-plus"></i>&nbsp; Создать новую категорию
             </a>
         </div>
     </div>
@@ -44,16 +44,12 @@
                     </a>
                     </div>*@
                             <div class="d-grid gap-2 d-md-block">
-                                <button class="btn btn-success" type="button">
-                                    <a asp-controller="Category" asp-route-Id="@obj.Id" asp-action="Edit" class="text-white text-decoration-none">
-                                        Редактировать
-                                    </a>
-                                </button>
-                                <button class="btn btn-danger" type="button">
-                                    <a asp-controller="Category" asp-route-Id="@obj.Id" asp-action="Delete" class="text-white text-decoration-none">
-                                        Удалить
-                                    </a>
-                                </button>
+                                <a asp-controller="Category" asp-route-Id="@obj.Id" asp-action="Edit" class="btn btn-success text-white text-decoration-none" role="button">
+                                    <i class="fa-solid fa-file-pen"></i>
+                                </a>
+                                <a asp-controller="Category" asp-route-Id="@obj.Id" asp-action="Delete" class="btn btn-danger text-white text-decoration-none" role="button">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>

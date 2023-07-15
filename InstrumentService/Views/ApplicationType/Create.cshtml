@@ -11,6 +11,7 @@
                     <label asp-for="Name" class="col-4 col-form-label">Название</label>
                     <div class="col-8">
                         <input asp-for="Name" class="form-control" id="Name">
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -18,10 +19,10 @@
                 <div class="mb-3 row">
                     <div class="col-8 offset-4 row">
                         <div class="col">
-                            <input type="submit" class="btn btn-info w-100" value="Создать"/>
+                            <input type="submit" class="btn btn-success w-100" value="Создать"/>
                         </div>
                         <div class="col">
-                            <a asp-action="Index" class="btn btn-success w-100">Назад</a>
+                            <a asp-action="Index" class="btn btn-secondary w-100"><i class="fa-solid fa-right-from-bracket"></i>Назад</a>
                         </div>
                     </div>
                 </div>
@@ -32,3 +33,9 @@
         </div>
     </div>
 </form>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
