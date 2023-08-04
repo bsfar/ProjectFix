@@ -11,5 +11,6 @@ namespace InstrumentService.Models
         [Required(ErrorMessage ="Порядок отображения является обязательным для заполнения")]
         [Range(1, int.MaxValue, ErrorMessage ="Порядок отображения должен быть больше 0")]
         public int? DisplayOrder { get; set; }
+       
     }
 }

@@ -16,6 +16,7 @@ namespace InstrumentService
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection)); 
             builder.Services.AddControllersWithViews();
+            
 
             var app = builder.Build();
 

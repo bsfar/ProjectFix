@@ -13,5 +13,6 @@ namespace InstrumentService.Data
         public DbSet<ApplicationType> ApplicationTypes { get; set; }
 
         public DbSet<Product> Product { get; set; }
+        
     }
 }

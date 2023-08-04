@@ -1,50 +1,51 @@
-﻿@model InstrumentService.Models.Product;
+﻿@model InstrumentService.Models.ViewModels.ProductVM
 
-@{
-    var title = "Создание товара";
+@{ 
+    var title = "Создать товар";
 }
+
 <form method="post" enctype="multipart/form-data">
-    @if (Model.Id != 0)
+    @if (Model.Product.Id != 0)
     {
-        title = "Изменение товара";
-        <input asp-for="Id" type="hidden" />
+        title = "Редактировать товар";
+        <input asp-for="Product.Id" hidden />
     }
 
 
     <div class="border p-3">
-        @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+        
         <div class="mb-3 row">
             <h2 class="text-primary pl-3">@title</h2>
         </div>
         <div class="row">
-            <div class="col-8">
+            <div class="col-8"> 
                 <div class="mb-3 row">
                     <div class="col-4">
-                    <label asp-for="Name" class="col-form-label">Название</label>
+                        <label asp-for="Product.Name" class="col-form-label">Название</label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="Name" class="form-control">
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <input asp-for="Product.Name" class="form-control"/>
+                        <span asp-validation-for="Product.Name" class="text-danger"></span>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-4">
-                    <label asp-for="Price" class="col-form-label">Цена</label>
+                    <label asp-for="Product.Price" class="col-form-label">Цена</label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="Price" class="form-control">
-                        <span asp-validation-for="Price" class="text-danger"></span>
+                        <input asp-for="Product.Price" class="form-control "/> 
+                        <span asp-validation-for="Product.Price" class="text-danger"></span>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-4">
-                    <label asp-for="Description" class="col-form-label">Порядок отображения</label>
+                    <label asp-for="Product.Description" class="col-form-label">Описание</label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="Description" class="form-control">
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <textarea asp-for="Product.Description" class="form-control summernote"></textarea>
+                        <span asp-validation-for="Product.Description" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -53,31 +54,47 @@
                     Image
                     </div>
                     <div class="col-8">
-                        <input type="file" name="file" id="uploadbox" multiple class="form-control" />
+                        <input type="file" name="files" id="uploadBox" multiple class="form-control" />
 
                     </div>
                 </div>
 
-@*                <div class="mb-3 row">
-                    <label asp-for="Description" class="col-4 col-form-label">Порядок отображения</label>
-                    <div class="col-8">
-                        <input asp-for="Description" class="form-control">
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                <div class="mb-3 row">
+                    <div class="col-4">
+                    <label asp-for="Product.CategoryId" class="col-4 col-form-label">Список категорий</label>
                     </div>
-                </div>*@
+                    <div class="col-8">
+                        <select asp-for="Product.CategoryId" asp-items="@Model?.CategorySelectList" class="form-control">
+                            <option disabled selected>-- Выбрать категорию --</option>
+                        </select>
+                        <span asp-validation-for="Product.CategoryId" class="text-danger">Выберите категорию</span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-4">
+                    <label asp-for="Product.ApplicationTypeId" class="col-4 col-form-label">Список категорий</label>
+                    </div>
+                    <div class="col-8">
+                        <select asp-for="Product.ApplicationTypeId" asp-items="@Model?.ApplicationTypeSelectList" class="form-control">
+                            <option disabled selected>-- Выбрать метод использования --</option>
+                        </select>
+                        <span asp-validation-for="Product.ApplicationTypeId" class="text-danger">Выберите метод использования</span>
+                    </div>
+                </div>
 
                 <div class="mb-3 row">
                     <div class="col-8 offset-4 row">
                         <div class="col">
-                            @if(Model.Id != 0)
+                            @if (Model.Product.Id != 0)
                             {
                                 //update
-                                <input type="submit" class="btn btn-secondary w-100" value="Изменить" />
+                                <input type="submit" class="btn btn-success w-100" value="Изменить" />
                             }
                             else
                             {
                                 //create
-                                <input type="submit" onclick ="return validateInput()" class="btn btn-success w-100" value="Создать" />
+                                <input type="submit" onclick="return validateInput()" class="btn btn-success w-100" value="Создать" />
                             }
                             
                         </div>
@@ -89,6 +106,9 @@
             </div>
             <div class="col-4">
                 @* Keep this empty *@
+                @if (@Model.Product.Id != 0){     
+                <img src="@WC.ImagePath@Model.Product.Image" width="100%" style="border-radius:5px; border:1px solid #bbb" />
+                }
             </div>
         </div>
     </div>
@@ -98,4 +118,22 @@
     @{
         <partial name="_ValidationScriptsPartial" />
     }
+    <script>
+        $(document).ready(function () {
+            $('.summernote').summernote({
+                height:250
+            });
+        });
+        function validateInput(){
+            if(document.getElementById("uploadBox").value==""){
+                Swal.fire(
+                    'Ошибка!',
+                    'Пожалуйста загрузите изображение!',
+                    'error'
+                )
+                return false;
+            }
+            return true;
+        }
+    </script>
 }

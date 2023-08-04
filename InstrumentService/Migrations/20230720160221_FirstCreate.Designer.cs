@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InstrumentService.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230717134647_AddProductToDb")]
-    partial class AddProductToDb
+    [Migration("20230720160221_FirstCreate")]
+    partial class FirstCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,8 +82,9 @@ namespace InstrumentService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("integer");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double>("Price")
                         .HasColumnType("double precision");
