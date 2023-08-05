@@ -13,6 +13,7 @@ namespace InstrumentService.Models
         [Range (1, int.MaxValue)]
         public double Price { get; set; }
         public string? Image { get; set; }
+        public string? ShortDescription { get; set; }
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public virtual Category Category { get; set; }

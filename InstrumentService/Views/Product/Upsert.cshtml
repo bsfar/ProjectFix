@@ -41,6 +41,16 @@
 
                 <div class="mb-3 row">
                     <div class="col-4">
+                        <label asp-for="Product.ShortDescription" class="col-form-label">Краткое описание</label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Product.ShortDescription" class="form-control "/> 
+                        <span asp-validation-for="Product.ShortDescription" class="text-danger"></span>
+                    </div>
+                </div>  
+
+                <div class="mb-3 row">
+                    <div class="col-4">
                     <label asp-for="Product.Description" class="col-form-label">Описание</label>
                     </div>
                     <div class="col-8">
