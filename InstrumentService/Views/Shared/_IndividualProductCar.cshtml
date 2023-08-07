@@ -7,7 +7,7 @@
                 <label class="float-start">@Model.Name</label>
             </div>
             <div class="col-5">
-                <label class="float-end"><span class="text-info h5">@Model.Price</span> / sqft</label>
+                <label class="float-end"><span class="text-primary h5">@string.Format("{0:N0} ₽", @Model.Price)</span> / sqft</label>
             </div>
         </div>
         <div class="d-flex justify-content-center">
