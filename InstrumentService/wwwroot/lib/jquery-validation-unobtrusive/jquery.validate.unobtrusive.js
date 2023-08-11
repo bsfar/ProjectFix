@@ -8,7 +8,10 @@
 
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
 /*global document: false, jQuery: false */
-
+jQuery.extend(jQuery.validator.messages, {
+    email: "Пожалуйста, введите корректный адрес электронной почты."
+    // Другие переопределения сообщений можно добавить здесь
+});
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
