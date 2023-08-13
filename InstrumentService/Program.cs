@@ -1,6 +1,7 @@
 using InstrumentService.Data;
 using InstrumentService.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace InstrumentService
@@ -25,6 +26,8 @@ namespace InstrumentService
                 options.Password.RequireNonAlphanumeric = false;
             }).AddDefaultTokenProviders().AddDefaultUI().AddErrorDescriber<CustomIdentityErrorDescriber>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
             //AddHttpContextAccessor - добавление HttpContextAccessor является необходимым, потому что 
             //приложение работает с текущим контекстом HTTP
             //В предоставленном коде он используется вместе с AddSession для конфигурации параметров сессии, что может
