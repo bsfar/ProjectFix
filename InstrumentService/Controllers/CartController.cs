@@ -85,6 +85,7 @@ namespace InstrumentService.Controllers
         [ActionName("Summary")]
         public async Task<IActionResult> SummaryPost(ProductUserCartVM productUserCartVM)
         {
+            //путь на разных системах иметь разные символы, поэтому используем Path.DirectorySeparatorChar
             var PastToTemplate = _webHostEnvironment.WebRootPath + Path.DirectorySeparatorChar.ToString()
                 + "templates" + Path.DirectorySeparatorChar.ToString() +
                 "Inquiry.html";
@@ -98,10 +99,12 @@ namespace InstrumentService.Controllers
             }
 
             StringBuilder productListSB = new StringBuilder();
+            //создаем строчки товаров, которые находятся в контексте
             foreach (var prop in ProductUserCartVM.ProductList)
             {
                 productListSB.Append($" - Имя: {prop.Name} <span style = 'font-size: 14px;'> (ID:{prop.Id})</span><br />");
             }
+            //string.Format опирается на плейсхолдеры и по сути вставляет в них нужные строки
             string messageBody = string.Format(HtmlBody,
                 ProductUserCartVM.ApplicationUser.FullName,
                 ProductUserCartVM.ApplicationUser.Email,

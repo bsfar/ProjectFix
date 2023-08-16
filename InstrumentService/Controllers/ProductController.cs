@@ -1,6 +1,7 @@
 ﻿using InstrumentService.Data;
 using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Runtime.CompilerServices;
 
 namespace InstrumentService.Controllers
 {
+    [Authorize(Roles = WC.AdminRole)]
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;

@@ -1,9 +1,11 @@
 ﻿using InstrumentService.Data;
 using InstrumentService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InstrumentService.Controllers
 {
+    [Authorize(Roles = WC.AdminRole)]
     public class ApplicationTypeController : Controller
     {
         private readonly ApplicationDbContext _dp;

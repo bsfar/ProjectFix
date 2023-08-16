@@ -30,18 +30,22 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Управление контентом
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Category" asp-action="Index">Категории</a>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="ApplicationType" asp-action="Index">Тип приложения</a>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Товар</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Создать нового администратора</a>
-                            </ul>
-                        </li>
+                        @if (User.IsInRole(WC.AdminRole))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Управление контентом
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Category" asp-action="Index">Категории</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="ApplicationType" asp-action="Index">Тип приложения</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Товар</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Создать нового администратора</a>
+                                </ul>
+                            </li>
+                        }
+                        
                         <li>
                             @if (HttpContextAccessor.HttpContext.Session.Get<List<ShoppingCart>>(WC.SessionCart) != null)
                             {

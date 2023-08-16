@@ -100,7 +100,7 @@ namespace InstrumentService.Areas.Identity.Pages.Account
             /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare("Password", ErrorMessage = "Пароль и пароль подтверждения не совпадают.")]
             public string ConfirmPassword { get; set; }
 
             public string FullName{ get; set; }
@@ -148,7 +148,7 @@ namespace InstrumentService.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, WC.CustomerRole);
                     }
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("Пользователь создал новую учетную запись с паролем.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -159,8 +159,8 @@ namespace InstrumentService.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Подтвердите свой адрес электронной почты",
+                        $"Пожалуйста, подтвердите свою учетную запись с помощью <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажав здесь</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -168,7 +168,14 @@ namespace InstrumentService.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        if (!User.IsInRole(WC.AdminRole))
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index");
+                        }
                         return LocalRedirect(returnUrl);
                     }
                 }
