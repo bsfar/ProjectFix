@@ -1,4 +1,5 @@
-﻿@model InstrumentService.Models.Product
+﻿@using InstrumentService_Utility;
+@model InstrumentService.Models.Product
 
 
 
@@ -7,10 +8,10 @@
         <input asp-for="Id" hidden />
 
 
-    <div class="border p-3">
+    <div class="border p-3 bg-white">
 
         <div class="mb-3 row">
-            <h2 class="text-primary pl-3">Удаление товара/h2>
+            <h2 class="text-primary pl-3">Удаление товара</h2>
         </div>
         <div class="row">
             <div class="col-8">
@@ -94,7 +95,7 @@
         $(document).ready(function () {
             $('.summernote').summernote({
                 height: 250
-                disabled:true
+                
             });
         });
     </script>

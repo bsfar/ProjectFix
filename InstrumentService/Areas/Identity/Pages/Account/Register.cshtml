@@ -1,6 +1,7 @@
 ﻿@page
+@using InstrumentService_Utility;
 @model RegisterModel
-@if (User.IsInRole(InstrumentService.WC.AdminRole))
+@if (User.IsInRole(WC.AdminRole))
 {
     <h1>Регистрация нового администратора</h1>
 }
@@ -40,7 +41,7 @@ else
                 <label asp-for="Input.ConfirmPassword">Потверждение пароля</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            @if (User.IsInRole(InstrumentService.WC.AdminRole))
+            @if (User.IsInRole(WC.AdminRole))
             {
                 <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-warning">Регистрация администратора</button>
             }

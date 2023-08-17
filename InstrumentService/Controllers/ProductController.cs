@@ -1,6 +1,7 @@
-﻿using InstrumentService.Data;
-using InstrumentService.Models;
+﻿using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
+using InstrumentService_DataAccess;
+using InstrumentService_Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

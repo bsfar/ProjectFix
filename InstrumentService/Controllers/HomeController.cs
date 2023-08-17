@@ -1,12 +1,11 @@
-﻿using InstrumentService.Data;
-using InstrumentService.Models;
+﻿using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
-using InstrumentService.Utility;
+using InstrumentService_Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
-namespace InstrumentService.Controllers
+namespace InstrumentService_DataAccess.Migrations
 {
     public class HomeController : Controller
     {

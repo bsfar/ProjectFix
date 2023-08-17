@@ -32,4 +32,10 @@
     <Folder Include="wwwroot\images\product\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\InstrumentService_DataAccess\InstrumentService_DataAccess.csproj" />
+    <ProjectReference Include="..\InstrumentService_Models\InstrumentService_Models.csproj" />
+    <ProjectReference Include="..\InstrumentService_Utility\InstrumentService_Utility.csproj" />
+  </ItemGroup>
+
 </Project>
