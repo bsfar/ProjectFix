@@ -1,5 +1,6 @@
 ﻿using InstrumentService.Models;
 using InstrumentService_DataAccess;
+using InstrumentService_DataAccess.Repository.IRepository;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,15 @@ namespace InstrumentService.Controllers
     [Authorize(Roles = WC.AdminRole)]
     public class ApplicationTypeController : Controller
     {
-        private readonly ApplicationDbContext _dp;
-        public ApplicationTypeController(ApplicationDbContext dp)
+        private readonly IApplicationTypeRepository _appTypeRep;
+        public ApplicationTypeController(IApplicationTypeRepository appTypeRep)
         {
-            _dp = dp;
+            _appTypeRep = appTypeRep;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            IEnumerable<ApplicationType> objlist = _dp.ApplicationTypes;
+            IEnumerable<ApplicationType> objlist = await _appTypeRep.GetAllAsync();
             return View(objlist);
         }
 
@@ -31,18 +32,18 @@ namespace InstrumentService.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(ApplicationType obj)
         {
-            _dp.ApplicationTypes.Add(obj);
-            _dp.SaveChanges();
+            _appTypeRep.Add(obj);
+            _appTypeRep.Save();
             return RedirectToAction("Index");
         }
         //GET - Edit
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> EditAsync(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            var obj = _dp.ApplicationTypes.Find(id);
+            var obj = await _appTypeRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
@@ -56,8 +57,8 @@ namespace InstrumentService.Controllers
         {
             if (ModelState.IsValid)
             {
-                _dp.ApplicationTypes.Update(obj);
-                _dp.SaveChanges();
+                _appTypeRep.Update(obj);
+                _appTypeRep.Save();
                 return RedirectToAction("Index");
             }
 
@@ -66,13 +67,13 @@ namespace InstrumentService.Controllers
 
         //GET - Delete
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> DeleteAsync(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            var obj = _dp.ApplicationTypes.Find(id);
+            var obj = await _appTypeRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
@@ -83,16 +84,16 @@ namespace InstrumentService.Controllers
         //POST - Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
+        public async Task<IActionResult> DeletePostAsync(int? id)
         {
-            var obj = _dp.ApplicationTypes.Find(id);
+            var obj = await _appTypeRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
             }
 
-            _dp.ApplicationTypes.Remove(obj);
-            _dp.SaveChanges();
+            _appTypeRep.Remove(obj);
+            _appTypeRep.Save();
             return RedirectToAction("Index");
         }
     }

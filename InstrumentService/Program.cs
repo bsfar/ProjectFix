@@ -1,4 +1,6 @@
 using InstrumentService_DataAccess;
+using InstrumentService_DataAccess.Repository;
+using InstrumentService_DataAccess.Repository.IRepository;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -46,6 +48,10 @@ namespace InstrumentService
                 //для авторизации или других критических функций
                 Options.Cookie.IsEssential = true;
             });
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IApplicationTypeRepository, ApplicationTypeRepository>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
             builder.Services.AddControllersWithViews();
             
 

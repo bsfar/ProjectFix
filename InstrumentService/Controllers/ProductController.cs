@@ -1,6 +1,7 @@
 ﻿using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
 using InstrumentService_DataAccess;
+using InstrumentService_DataAccess.Repository.IRepository;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,27 +16,29 @@ namespace InstrumentService.Controllers
     [Authorize(Roles = WC.AdminRole)]
     public class ProductController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IProductRepository _prodRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        
+        public ProductController(IProductRepository prodRepo, IWebHostEnvironment webHostEnvironment)
         {
-            _db = db;
+            _prodRepo = prodRepo;
             _webHostEnvironment = webHostEnvironment;
+            
         }
 
         public async Task<IActionResult> IndexAsync()
         {
-            IEnumerable<Product> products = await _db.Product
-            .Include(p => p.Category)
-            .Include(p => p.ApplicationType)
-            .ToArrayAsync();
+            IEnumerable<Product> products = await _prodRepo.GetAllAsync(includeProperties: "Category,ApplicationType");
+            //.Include(p => p.Category)
+            //.Include(p => p.ApplicationType)
+            //.ToArrayAsync();
 
 
             return View(products);
         }
 
         //GET - UPSERT
-        public IActionResult Upsert(int? id)
+        public async Task<IActionResult> UpsertAsync(int? id)
         {
 
             //IEnumerable<SelectListItem> CategoryDropDown = _db.Category.Select(i => new SelectListItem
@@ -50,17 +53,20 @@ namespace InstrumentService.Controllers
             ProductVM productVM = new ProductVM()
             {
                 Product = new Product(),
-                CategorySelectList = _db.Category.Select(i => new SelectListItem
-                {
-                    Text = i.Name,
-                    Value = i.Id.ToString()
-                }),
-                ApplicationTypeSelectList = _db.ApplicationTypes.Select(i => new SelectListItem
-                {
-                    Text = i.Name,
-                    Value = i.Id.ToString()
-                })
+                CategorySelectList = _prodRepo.GetAllDropDownList("Category"),
+                ApplicationTypeSelectList = _prodRepo.GetAllDropDownList("ApplicationType")
             };
+            //    CategorySelectList = _db.Category.Select(i => new SelectListItem
+            //    {
+            //        Text = i.Name,
+            //        Value = i.Id.ToString()
+            //    }),
+            //    ApplicationTypeSelectList = _db.ApplicationTypes.Select(i => new SelectListItem
+            //    {
+            //        Text = i.Name,
+            //        Value = i.Id.ToString()
+            //    })
+            //};
 
             if (id == null)
             {
@@ -69,7 +75,7 @@ namespace InstrumentService.Controllers
             }
             else
             {
-                productVM.Product = _db.Product.Find(id);
+                productVM.Product = await _prodRepo.FindAsync(id.GetValueOrDefault());
                 if (productVM.Product == null)
                 {
                     return NotFound();
@@ -87,25 +93,25 @@ namespace InstrumentService.Controllers
             ModelState.Remove("Product.ApplicationType");
             if (!ModelState.IsValid)
             {
+                productVM.CategorySelectList = _prodRepo.GetAllDropDownList("Category");
+                //Category[] categorys = await _db.Category.ToArrayAsync();
+                //IEnumerable<SelectListItem> categoryDropDown = categorys.Select(c =>
+                //    new SelectListItem
+                //    {
+                //        Text = c.Name,
+                //        Value = c.Id.ToString()
+                //    });
+                //ApplicationType[] applicationTypes = await _db.ApplicationTypes.ToArrayAsync();
+                //IEnumerable<SelectListItem> AppTypeDropDown = applicationTypes.Select(at =>
+                //    new SelectListItem
+                //    {
+                //        Text = at.Name,
+                //        Value = at.Id.ToString()
+                //    });
 
-                Category[] categorys = await _db.Category.ToArrayAsync();
-                IEnumerable<SelectListItem> categoryDropDown = categorys.Select(c =>
-                    new SelectListItem
-                    {
-                        Text = c.Name,
-                        Value = c.Id.ToString()
-                    });
-                ApplicationType[] applicationTypes = await _db.ApplicationTypes.ToArrayAsync();
-                IEnumerable<SelectListItem> AppTypeDropDown = applicationTypes.Select(at =>
-                    new SelectListItem
-                    {
-                        Text = at.Name,
-                        Value = at.Id.ToString()
-                    });
 
-
-                productVM.CategorySelectList = categoryDropDown;
-                productVM.ApplicationTypeSelectList = AppTypeDropDown;
+                
+                productVM.ApplicationTypeSelectList = _prodRepo.GetAllDropDownList("ApplicationType");
                 return View(productVM);
             }
             else
@@ -142,13 +148,13 @@ namespace InstrumentService.Controllers
                     }
 
                     productVM.Product.Image = fileName + extension;
-                    _db.Product.Add(productVM.Product);
+                    _prodRepo.Add(productVM.Product);
 
                 }
                 else
                 {
                     //updating
-                    var objFromDb = _db.Product.AsNoTracking().FirstOrDefault(u => u.Id == productVM.Product.Id);
+                    var objFromDb = _prodRepo.FirstOrDefault(u => u.Id == productVM.Product.Id, isTracking: false);
 
                     if (files.Count > 0)
                     {
@@ -172,9 +178,9 @@ namespace InstrumentService.Controllers
                     {
                         productVM.Product.Image = objFromDb.Image;
                     }
-                    _db.Product.Update(productVM.Product);
+                    _prodRepo.Update(productVM.Product);
                 }
-                _db.SaveChanges();
+                _prodRepo.Save();
                 return RedirectToAction("Index");
             }
         }
@@ -188,10 +194,12 @@ namespace InstrumentService.Controllers
             {
                 return NotFound();
             }
-            Product? product = await _db.Product
-                .Include(p => p.Category)
-                .Include(p => p.ApplicationType)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            Product? product = _prodRepo.FirstOrDefault(x => x.Id == id, includeProperties: "Category,ApplicationType");
+                
+                //await _db.Product
+                //.Include(p => p.Category)
+                //.Include(p => p.ApplicationType)
+                //.FirstOrDefaultAsync(p => p.Id == id);
             //product.Category = _db.Category.Find(product.CategoryId);
             if (product == null)
             {
@@ -205,7 +213,7 @@ namespace InstrumentService.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeletePost(int? id)
         {
-            var obj = _db.Product.FirstOrDefault(u => u.Id == id);
+            var obj = _prodRepo.FirstOrDefault(u => u.Id == id);
             if (obj == null)
             {
                 return NotFound();
@@ -218,8 +226,8 @@ namespace InstrumentService.Controllers
                 System.IO.File.Delete(oldFile);
             }
 
-            _db.Product.Remove(obj);
-            _db.SaveChanges();
+            _prodRepo.Remove(obj);
+            _prodRepo.Save();
             return RedirectToAction("Index");
         }
     }

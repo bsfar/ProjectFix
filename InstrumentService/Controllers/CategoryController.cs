@@ -1,5 +1,6 @@
 ﻿using InstrumentService.Models;
 using InstrumentService_DataAccess;
+using InstrumentService_DataAccess.Repository.IRepository;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,17 @@ namespace InstrumentService.Controllers
     [Authorize(Roles = WC.AdminRole)]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+
+        private readonly ICategoryRepository _catRep;
+        public CategoryController(ICategoryRepository categoryRepository)
         {
-            _db = db;
+
+            _catRep = categoryRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            IEnumerable<Category> objlist = _db.Category;
+            IEnumerable<Category> objlist = await _catRep.GetAllAsync();
             return View(objlist);
         }
 
@@ -33,8 +36,8 @@ namespace InstrumentService.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Category.Add(obj);
-                _db.SaveChanges();
+                _catRep.Add(obj);
+                _catRep.Save();
                 return RedirectToAction("Index");
             }
 
@@ -42,13 +45,13 @@ namespace InstrumentService.Controllers
         }
 
         //GET - Edit
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> EditAsync(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            var obj = _db.Category.Find(id);
+            var obj = await _catRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
@@ -63,8 +66,8 @@ namespace InstrumentService.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Category.Update(obj);
-                _db.SaveChanges();
+                _catRep.Update(obj);
+                _catRep.Save();
                 return RedirectToAction("Index");
             }
 
@@ -73,13 +76,13 @@ namespace InstrumentService.Controllers
 
         //GET - Delete
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> DeleteAsync(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            var obj = _db.Category.Find(id);
+            var obj = await _catRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
@@ -90,17 +93,17 @@ namespace InstrumentService.Controllers
         //POST - Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
+        public async Task<IActionResult> DeletePostAsync(int? id)
         {
-            var obj = _db.Category.Find(id);
+            var obj = await _catRep.FindAsync(id.GetValueOrDefault());
             if (obj == null)
             {
                 return NotFound();
             }
-            
-                _db.Category.Remove(obj);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+
+            _catRep.Remove(obj);
+            _catRep.Save();
+            return RedirectToAction("Index");
         }
     }
 }
