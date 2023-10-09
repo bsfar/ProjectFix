@@ -9,6 +9,6 @@ namespace InstrumentService_DataAccess.Repository.IRepository
 {
     public interface IApplicationTypeRepository : IRepository<ApplicationType>
     {
-        void Update(ApplicationType applicationType);
+        Task UpdateAsync(ApplicationType applicationType);
     }
 }

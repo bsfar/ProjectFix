@@ -7,8 +7,8 @@ namespace InstrumentService.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        public string Name { get; set; }
+        [Required(ErrorMessage ="Ошибка")]
+        public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         [Range (1, int.MaxValue)]
         public double Price { get; set; }
@@ -16,10 +16,10 @@ namespace InstrumentService.Models
         public string? ShortDescription { get; set; }
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
 
         public int ApplicationTypeId { get; set; }
         [ForeignKey("ApplicationTypeId")]
-        public virtual ApplicationType ApplicationType { get; set; }
+        public virtual ApplicationType? ApplicationType { get; set; }
     }
 }

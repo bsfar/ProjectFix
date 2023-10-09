@@ -17,9 +17,9 @@ namespace InstrumentService_DataAccess.Repository
             _db = db;
         }
 
-        public void Update(Category category)
+        public async Task UpdateAsync(Category category)
         {
-            var objFromDb = base.FirstOrDefault(u => u.Id == category.Id);
+            var objFromDb = await FirstOrDefaultAsync(u => u.Id == category.Id);
             if (objFromDb != null)
             {
                 objFromDb.Name= category.Name;

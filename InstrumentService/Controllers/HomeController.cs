@@ -1,5 +1,6 @@
 ﻿using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
+using InstrumentService_DataAccess.Repository.IRepository;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +11,26 @@ namespace InstrumentService_DataAccess.Migrations
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _db;
+        private readonly IProductRepository _productRepo;
+        private readonly ICategoryRepository _categoryRepo;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRepo, ICategoryRepository categoryRepo)
         {
-            _db = db;
+            _productRepo = productRepo;
             _logger = logger;
+            _categoryRepo = categoryRepo;
         }
-
-        public IActionResult Index()
+        
+        public async Task<IActionResult> IndexAsync()
         {
             HomeVM homeVM = new HomeVM()
             {
-                Products = _db.Product.Include(u => u.Category).Include(u => u.ApplicationType),
-                Categories = _db.Category
+                Products = await _productRepo.GetAllAsync(includeProperties: "Category,ApplicationType"),
+                Categories = await _categoryRepo.GetAllAsync(),
             };
             return View(homeVM);
         }
-        public IActionResult Details(int id)
+        public async Task<IActionResult> DetailsAsync(int id)
         {
             //получаем данные о сессии
             List<ShoppingCart> shoppingCartsList = new List<ShoppingCart>();
@@ -39,8 +42,8 @@ namespace InstrumentService_DataAccess.Migrations
 
             DetailsVM DetailsVM = new DetailsVM()
             {
-                Product = _db.Product.Include(u => u.Category).Include(u => u.ApplicationType)
-                .Where(u => u.Id == id).FirstOrDefault(),
+                Product = await _productRepo.FirstOrDefaultAsync(u => u.Id == id, includeProperties: "Category,ApplicationType"),
+                
                 ExistsInCart = false
             };
             //Проверка есть ли товар в сессии
@@ -63,7 +66,7 @@ namespace InstrumentService_DataAccess.Migrations
             }
             shoppingCartsList.Add(new ShoppingCart { ProductId = id });
             HttpContext.Session.Set(WC.SessionCart, shoppingCartsList);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
         public IActionResult RemoveFromCart(int id)
         {
@@ -78,7 +81,7 @@ namespace InstrumentService_DataAccess.Migrations
                 shoppingCartsList.Remove(itemToRemove);
             }
             HttpContext.Session.Set(WC.SessionCart, shoppingCartsList);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
         public IActionResult Privacy()
         {

@@ -89,8 +89,7 @@ namespace InstrumentService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upsert(ProductVM productVM)
         {
-            ModelState.Remove("Product.Category");
-            ModelState.Remove("Product.ApplicationType");
+            
             if (!ModelState.IsValid)
             {
                 productVM.CategorySelectList = _prodRepo.GetAllDropDownList("Category");
@@ -154,7 +153,7 @@ namespace InstrumentService.Controllers
                 else
                 {
                     //updating
-                    var objFromDb = _prodRepo.FirstOrDefault(u => u.Id == productVM.Product.Id, isTracking: false);
+                    var objFromDb = await _prodRepo.FirstOrDefaultAsync(u => u.Id == productVM.Product.Id, isTracking: false);
 
                     if (files.Count > 0)
                     {
@@ -194,7 +193,7 @@ namespace InstrumentService.Controllers
             {
                 return NotFound();
             }
-            Product? product = _prodRepo.FirstOrDefault(x => x.Id == id, includeProperties: "Category,ApplicationType");
+            Product? product = await _prodRepo.FirstOrDefaultAsync(x => x.Id == id, includeProperties: "Category,ApplicationType");
                 
                 //await _db.Product
                 //.Include(p => p.Category)
@@ -211,9 +210,9 @@ namespace InstrumentService.Controllers
         //POST - Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(int? id)
+        public async Task<IActionResult> DeletePostAsync(int? id)
         {
-            var obj = _prodRepo.FirstOrDefault(u => u.Id == id);
+            var obj = await _prodRepo.FirstOrDefaultAsync(u => u.Id == id);
             if (obj == null)
             {
                 return NotFound();

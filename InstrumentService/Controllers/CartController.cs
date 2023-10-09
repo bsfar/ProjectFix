@@ -1,6 +1,8 @@
 ﻿using InstrumentService.Models;
 using InstrumentService.Models.ViewModels;
 using InstrumentService_DataAccess;
+using InstrumentService_DataAccess.Repository.IRepository;
+using InstrumentService_Models;
 using InstrumentService_Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -14,21 +16,32 @@ namespace InstrumentService.Controllers
     [Authorize]
     public class CartController : Controller
     {
-        private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEmailSender _emailSender;
+        private readonly IApplicationUserRepository _appUserRepo;
+        private readonly IProductRepository _productRepo;
+        private readonly IInquiryDetailRepository _inquiryDetailRepo;
+        private readonly IInquiryHeaderRepository _inquiryHeaderRepo;
+
+
         [BindProperty]
         public ProductUserCartVM ProductUserCartVM { get; set; }
 
-        public CartController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, IEmailSender emailSender)
+        public CartController( IWebHostEnvironment webHostEnvironment, IEmailSender emailSender, IInquiryHeaderRepository inquiryHeaderRepo,
+            IInquiryDetailRepository inquiryDetailRepo, IProductRepository productRepo, IApplicationUserRepository appUserRepo)
         {
-            _db = db;
             _webHostEnvironment = webHostEnvironment;
             _emailSender = emailSender;
+
+            _inquiryHeaderRepo = inquiryHeaderRepo;
+            _productRepo = productRepo;
+            _appUserRepo = appUserRepo;
+            _inquiryDetailRepo = inquiryDetailRepo;
+
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
             List<ShoppingCart> shoppingCarts = new List<ShoppingCart>();
             if (HttpContext.Session.Get<IEnumerable<ShoppingCart>>(WC.SessionCart) != null
@@ -39,8 +52,7 @@ namespace InstrumentService.Controllers
             }
             //List<int> prodInCart = shoppingCarts.Select(x => x.ProductId).ToList();
             //IEnumerable<Product> prodList = _db.Product.Where(x => prodInCart.Contains(x.Id));
-            IEnumerable<Product> prodList = _db.Product.Where(x => shoppingCarts.Select(x => x.ProductId).Contains(x.Id));
-
+            IEnumerable<Product> prodList = await _productRepo.GetAllAsync(x => shoppingCarts.Select(x => x.ProductId).Contains(x.Id));
 
             return View(prodList);
         }
@@ -53,9 +65,9 @@ namespace InstrumentService.Controllers
         [ActionName("Index")]
         public IActionResult IndexPost()
         {
-            return RedirectToAction(nameof(Summary));
+            return RedirectToAction("Summary");
         }
-        public IActionResult Summary()
+        public async Task<IActionResult> SummaryAsync()
         {
             //в claimsIdentity записываю утверждения о пользователе из http контекста
             ClaimsIdentity claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
@@ -71,11 +83,11 @@ namespace InstrumentService.Controllers
             }
             //List<int> prodInCart = shoppingCarts.Select(x => x.ProductId).ToList();
             //IEnumerable<Product> prodList = _db.Product.Where(x => prodInCart.Contains(x.Id));
-            IEnumerable<Product> prodList = _db.Product.Where(x => shoppingCarts.Select(x => x.ProductId).Contains(x.Id));
+            IEnumerable<Product> prodList = await _productRepo.GetAllAsync(x => shoppingCarts.Select(x => x.ProductId).Contains(x.Id));
 
             ProductUserCartVM = new ProductUserCartVM()
             {
-                ApplicationUser = _db.ApplicationUser.FirstOrDefault(x => x.Id == claim.Value),
+                ApplicationUser = await _appUserRepo.FirstOrDefaultAsync(x => x.Id == claim.Value),
                 ProductList = prodList.ToList()
             };
             return View(ProductUserCartVM);
@@ -85,6 +97,8 @@ namespace InstrumentService.Controllers
         [ActionName("Summary")]
         public async Task<IActionResult> SummaryPost(ProductUserCartVM productUserCartVM)
         {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             //путь на разных системах иметь разные символы, поэтому используем Path.DirectorySeparatorChar
             var PastToTemplate = _webHostEnvironment.WebRootPath + Path.DirectorySeparatorChar.ToString()
                 + "templates" + Path.DirectorySeparatorChar.ToString() +
@@ -113,7 +127,29 @@ namespace InstrumentService.Controllers
 
             await _emailSender.SendEmailAsync(WC.EmailAdmin, subject, messageBody);
 
-                return RedirectToAction(nameof(InquiryConfirmation));
+            InquiryHeader inquiryHeader = new InquiryHeader()
+            {
+                ApplicationUserId = claim.Value,
+                FullName = ProductUserCartVM.ApplicationUser.FullName,
+                Email = ProductUserCartVM.ApplicationUser.Email,
+                PhoneNumber = ProductUserCartVM.ApplicationUser.PhoneNumber,
+                InquiryDate = DateTime.UtcNow
+            };
+            _inquiryHeaderRepo.Add(inquiryHeader);
+            _inquiryHeaderRepo.Save();
+
+            foreach (var prod in ProductUserCartVM.ProductList)
+            {
+                InquiryDetail inquiryDetail = new InquiryDetail()
+                {
+                    InquiryHeaderId = inquiryHeader.Id,
+                    ProductId = prod.Id
+                };
+                _inquiryDetailRepo.Add(inquiryDetail);
+                
+            }
+            _inquiryDetailRepo.Save();
+            return RedirectToAction(nameof(InquiryConfirmation));
         }
         public IActionResult InquiryConfirmation()
         {
@@ -133,7 +169,7 @@ namespace InstrumentService.Controllers
             shoppingCarts.Remove(shoppingCarts.FirstOrDefault(x => x.ProductId == id));
             HttpContext.Session.Set(WC.SessionCart, shoppingCarts);
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
     }
 }

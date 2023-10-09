@@ -17,13 +17,15 @@ namespace InstrumentService_DataAccess.Repository
             _db = db;
         }
 
-        public void Update(ApplicationType category)
+        public async Task UpdateAsync(ApplicationType category)
         {
-            var objFromDb = base.FirstOrDefault(u => u.Id == category.Id);
+            var objFromDb = await base.FirstOrDefaultAsync(u => u.Id == category.Id);
             if (objFromDb != null)
             {
                 objFromDb.Name= category.Name;
             }
         }
+
+
     }
 }

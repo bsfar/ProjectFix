@@ -57,7 +57,7 @@ namespace InstrumentService.Controllers
         {
             if (ModelState.IsValid)
             {
-                _appTypeRep.Update(obj);
+                _appTypeRep.UpdateAsync(obj);
                 _appTypeRep.Save();
                 return RedirectToAction("Index");
             }
