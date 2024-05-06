@@ -28,8 +28,13 @@ namespace InstrumentService_DataAccess.Repository
         {
             return await dbSet.FindAsync(id);
         }
+        
 
-        public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> filter = null, string includeProperties = null, bool isTracking = true)
+        public async Task<T> FirstOrDefaultAsync(
+            Expression<Func<T, bool>> filter = null, 
+            string includeProperties = null, 
+            bool isTracking = true
+            )
         {
             IQueryable<T> query = dbSet;
 

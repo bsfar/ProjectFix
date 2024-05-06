@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Runtime.Loader;
 using InstrumentService_DataAccess;
 using InstrumentService_DataAccess.Repository;
 using InstrumentService_DataAccess.Repository.IRepository;
@@ -15,8 +17,30 @@ namespace InstrumentService
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddRazorPages().AddRazorRuntimeCompilation(); 
+            builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+            var currentAssembly = Assembly.GetExecutingAssembly();
+            Console.WriteLine($"Сборка текущего приложения (Assembly): {currentAssembly.FullName}");
 
+            // Получаем сборку текущего приложения с помощью AssemblyLoadContext.Default.Assemblies
+            var contextAssemblies = AssemblyLoadContext.Default.Assemblies;
+            foreach (var assembly in contextAssemblies)
+            {
+                Console.WriteLine($"Сборка в контексте загрузки сборок (AssemblyLoadContext.Default.Assemblies): {assembly.FullName}");
+            }
+            // var r = Assembly.GetExecutingAssembly();
+            // var a = AssemblyLoadContext.Default.Assemblies;
+            // Type t = typeof(Program);
+            // Assembly assemFromType = t.Assembly;
+            // Console.WriteLine("Assembly that contains Example:");
+            // Console.WriteLine("   {0}\n", assemFromType.FullName);
+            //
+            // // Get the currently executing assembly.
+            // Assembly currentAssem = Assembly.GetExecutingAssembly();
+            // Console.WriteLine("Currently executing assembly:");
+            // Console.WriteLine("   {0}\n", currentAssem.FullName);
+            //
+            // Console.WriteLine("The two Assembly objects are equal: {0}",
+            //     assemFromType.Equals(currentAssem));
             string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connection));

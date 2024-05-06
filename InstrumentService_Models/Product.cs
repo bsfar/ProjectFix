@@ -20,6 +20,6 @@ namespace InstrumentService.Models
 
         public int ApplicationTypeId { get; set; }
         [ForeignKey("ApplicationTypeId")]
-        public virtual ApplicationType? ApplicationType { get; set; }
+        public ApplicationType? ApplicationType { get; set; }
     }
 }
